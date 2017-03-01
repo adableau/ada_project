@@ -54,6 +54,7 @@ def ALSUpdate(V, k, iters=max_iter):
 
 
 def fit(V, k, type=0, algorithm="multiplicative"):
+    print algorithm
     if algorithm == "multiplicative":
         if type == 0:
             return EuclideanDistanceUpdateRule(V, k)
@@ -78,7 +79,7 @@ def normalize(X):
 if __name__ == "__main__":
     V = np.array([[1., 2., 3., 4., 5.], [5., 6., 7., 8., 8.], [9., 10., 11., 12., 5]])
 
-    W, H = fit(V, k=2, type=0, algorithm="multiplicative")
+    W, H = fit(V, k=2, type=1, algorithm="multiplicative")
 
     print("W = ")
     print(W)
