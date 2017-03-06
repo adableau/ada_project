@@ -49,7 +49,7 @@ parser.add_argument('--sg_filtering', dest='sg_bl',
                     help='Segmentation strategy for MGphrase')
 
 parser.add_argument('--verbose', type=int, dest='verbose', default=0)
-
+#python run_nmf.py --rank 10 --delta_topic 50 --learning_rate 'invsqrt'
 args = parser.parse_args()
 X_normalized = False
 

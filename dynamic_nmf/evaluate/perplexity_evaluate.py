@@ -82,7 +82,7 @@ def graph_draw(topic, perplexity):
     plt.show()
 
 
-def perplexity_main(all_word_path, model_topic_path,k):
+def perplexity_main(all_word_path, model_topic_path, k):
     topic = []
     perplexity_list = []
     f1 = open(all_word_path, 'r')
@@ -110,8 +110,12 @@ def perplexity_main(all_word_path, model_topic_path,k):
     print perplexity_list
 
 
-all_word_path = "E://test.txt"
-model_topic_path = "E://model-final-"
-k = [5]
-perplexity_main(all_word_path, model_topic_path,k)
-# graph_draw(topic, perplexity_list)
+if __name__ == "__main__":
+    """
+    all_word_path: all word lists
+    model_topic_path:topic word1 0.2636 word2 0.369
+    """
+    all_word_path = "E://test.txt"
+    model_topic_path = "E://model-final-"
+    k = [5]
+    perplexity_main(all_word_path, model_topic_path, k)

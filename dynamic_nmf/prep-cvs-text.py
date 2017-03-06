@@ -3,12 +3,12 @@
 """
 Tool to pre-process documents contained one or more directories, and export a document-term matrix for each directory.
 """
+import csv
 import os, os.path, sys, codecs
 import logging as log
 from optparse import OptionParser
 
 import text.util
-
 
 # --------------------------------------------------------------
 
@@ -38,8 +38,7 @@ def main():
         dir_out = os.getcwd()  # os.getcwd() 方法用于返回当前工作目录
     else:
         dir_out = options.dir_out
-
-    # Load required stopwords
+        # Load required stopwords
     if options.stoplist_file is None:
         stopwords = text.util.load_stopwords()
     else:
@@ -53,27 +52,48 @@ def main():
 
         dir_name = os.path.basename(in_path)
         # Read content of all documents in the directory
-        docgen = text.util.DocumentBodyGenerator([in_path], options.min_doc_length)
-        docs = []
-        doc_ids = []
-        for doc_id, body in docgen:
-            print doc_id
-            docs.append(body)
-            doc_ids.append(doc_id)
-        log.info("Found %d documents to parse" % len(docs))
 
-        # Pre-process the documents
-        log.info("Pre-processing documents (%d stopwords, tfidf=%s, normalize=%s, min_df=%d, max_ngram=%d) ..." % (
-            len(stopwords), options.apply_tfidf, options.apply_norm, options.min_df, options.max_ngram))
-        (X, terms) = text.util.preprocess(docs, stopwords, min_df=options.min_df, apply_tfidf=options.apply_tfidf,
-                                          apply_norm=options.apply_norm, ngram_range=(1, options.max_ngram))
-        log.info("Created %dx%d document-term matrix" % X.shape)
 
-        # Save the pre-processed documents
-        out_prefix = os.path.join(dir_out, dir_name)
-        print "--out_prefix--"
-        print out_prefix
-        text.util.save_corpus(out_prefix, X, terms, doc_ids)
+        #  load doc-cvs
+        """
+            处理cvs格式的数据，cvs第一列：时间，第二列words
+            按年将数据分开
+        """
+        csvfile = file('immigrants.csv', 'rb')
+        reader = csv.reader(csvfile)
+
+        for line in reader:
+            docs = []
+            doc_ids = []
+            doc_year = line[0].split('_')[0]
+            print doc_year
+            doc_year = doc_ids.append(doc_year)
+            doc_month = line[0].split('_')[1]
+
+            docs.append(line[1])
+            doc_ids.append(line[0])
+
+            #每个月一个文件
+            log.info("Found %d documents to parse" % len(docs))
+
+            # Pre-process the documents
+            log.info("Pre-processing documents (%d stopwords, tfidf=%s, normalize=%s, min_df=%d, max_ngram=%d) ..." % (
+                len(stopwords), options.apply_tfidf, options.apply_norm, options.min_df, options.max_ngram))
+            (X, terms) = text.util.preprocess(docs, stopwords, min_df=options.min_df, apply_tfidf=options.apply_tfidf,
+                                              apply_norm=options.apply_norm, ngram_range=(1, options.max_ngram))
+            log.info("Created %dx%d document-term matrix" % X.shape)
+
+            # Save the pre-processed documents
+            out_prefix = os.path.join(dir_out, doc_year,doc_month)
+            #out_prefix = os.path.join(dir_out, dir_names)
+            print "--out_prefix--"
+            print out_prefix
+            text.util.save_corpus(out_prefix, X, terms, doc_ids)
+
+        csvfile.close()
+
+        #
+
 
 
 # --------------------------------------------------------------

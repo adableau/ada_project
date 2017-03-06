@@ -6,6 +6,7 @@ from numpy import *
 from numpy.linalg import norm
 from time import time
 from sys import stdout
+import numpy as np
 
 
 def nmf(V, k, tol, timelimit, maxiter):
@@ -21,8 +22,8 @@ def nmf(V, k, tol, timelimit, maxiter):
     ic = shape(V)[0]
     fc = shape(V)[1]
     # [0,1]-uniform Random initialization
-    W = array([random.uniform(0,1,size=k) for i in range(ic)])
-    H = array([random.uniform(0,1,size=fc) for i in range(k)])
+    W = array([random.uniform(0, 1, size=k) for i in range(ic)])
+    H = array([random.uniform(0, 1, size=fc) for i in range(k)])
 
     initt = time();
 

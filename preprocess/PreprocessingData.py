@@ -1,5 +1,5 @@
 # -*- coding:utf-8 -*-
-#词干化、去停用词处理
+# 词干化、去停用词处理
 
 import os
 import nltk
@@ -16,11 +16,10 @@ import jieba.posseg
 from nltk.stem import WordNetLemmatizer
 import codecs
 
-
 # 修改了第一行与第二行的保存的地方
 localpath_EditionDate = '/home/baiqingchun/00_data/20newsGroup'
 # 分词后的localpath_EditionDate
-wordseg_localpath_EditionDate ='/home/baiqingchun/00_data/20_output_data/'
+wordseg_localpath_EditionDate = '/home/baiqingchun/00_data/20_output_data/'
 
 deleteList = ['SECTION:', 'LENGTH:', 'Final Edition:', 'To the Editor:', 'BYLINE:', 'Late Edition', 'SOURCE:']
 
@@ -147,14 +146,13 @@ def DeletePunctuation(str):
 
 # nltk分词、词性标注
 def JiebaPosseg(str):
-    seg  = jieba.posseg.cut(str)
+    seg = jieba.posseg.cut(str)
     list = []
     for item in seg:
-       #print(item)
-       if(item.word!=' ' and item.word !='\n'):
-           list.append((item.word,item.flag))
+        # print(item)
+        if (item.word != ' ' and item.word != '\n'):
+            list.append((item.word, item.flag))
     return list
-
 
 
 # 判断是不是名词
@@ -193,20 +191,20 @@ def penn_to_wn(tag):
 # dirpath
 def WriteToLocal(dirpath):
     files = os.listdir(dirpath)
-    for folderName in files:##第一层文件夹
+    for folderName in files:  ##第一层文件夹
         rootpath = os.path.join(dirpath, folderName)
         secondFolders = os.listdir(rootpath)
-        for secondFolder in  secondFolders:
+        for secondFolder in secondFolders:
             fullpath = os.path.join(rootpath, secondFolder)
             txtFiles = os.listdir(fullpath)
-            for txtName in txtFiles: #第二个文件夹
-                fullpaths= os.path.join(fullpath, txtName)
+            for txtName in txtFiles:  # 第二个文件夹
+                fullpaths = os.path.join(fullpath, txtName)
                 print fullpaths
-                list = ReadTextFile(fullpaths) #对文本分句、分词
-                save_path = wordseg_localpath_EditionDate+ '/' + folderName +'/' +secondFolder
+                list = ReadTextFile(fullpaths)  # 对文本分句、分词
+                save_path = wordseg_localpath_EditionDate + '/' + folderName + '/' + secondFolder
                 if not os.path.exists(save_path):
                     os.makedirs(save_path)
-                save_path = save_path +'/'+ txtName
+                save_path = save_path + '/' + txtName
                 file_write = open(save_path, 'w')
                 sample_list = [line + ' ' for line in list]
                 for line in sample_list:
@@ -237,7 +235,7 @@ def JudgeTheTxtFile(path):
 
 # 判断文章中的第一行出版社和第二行的时间是不是这个顺序
 def JudgeEditionTime(path):
-    #path = 'E:\\LTN\\test\\DataDelete-N\\1997\\delete5.txt'
+    # path = 'E:\\LTN\\test\\DataDelete-N\\1997\\delete5.txt'
     monthList = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october',
                  'november', 'december']
     flag1 = 0
