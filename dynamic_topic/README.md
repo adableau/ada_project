@@ -2,6 +2,44 @@
 
 ### Summary
 
+* Required: [numpy >= 1.8.0](http://www.numpy.org/)
+* Required: [scikit-learn >= 0.14](http://scikit-learn.org/stable/)
+* Required for utility tools: [prettytable >= 0.7.2](https://code.google.com/p/prettytable/)
+* Required for automatic model selection: [gensim >= 0.10.3](https://radimrehurek.com/gensim/)
+
+### Basic Usage
+
+
+
+##### Step 1: Pre-processing
+Before applying dynamic topic modeling, the first step is to pre-process the documents from each time window
+    -o data   output data address
+
+    python prep-text.py /home/baiqingchun/00_data/20_output_data/test/alt.atheism -o data --tfidf --norm
+
+for the cvs data
+
+    python prep--cvs-text.py -o data --tfidf --norm
+
+The result of this process will be a collection of Joblib binary files (*.pkl and *.npy) written to the directory 'data'
+
+##### Step 2: Topic Modeling
+
+    python find-window-topics.py data/month1.pkl data/month2.pkl data/month3.pkl -k 5 -o out
+
+When the process has completed, we can view the descriptiors (i.e. the top ranked terms) for the resulting window topics as follows:
+
+	python display-topics.py out/month1_windowtopics_k05.pkl out/month2_windowtopics_k05.pkl out/month3_windowtopics_k05.pkl
+	python display-topics.py out/.pkl_windowtopics_k15.pkl out/pkl_windowtopics_k05.pkl out/month3_windowtopics_k05.pkl
+
+The top terms and document IDs can be exported from a NMF results file to two individual comma-separated files using 'export-csv.py'. For instance, to export the top 50 terms and document IDs for a single results file:
+
+	python export-csv.py out/month1_windowtopics_k05.pkl -t 50
+
+##### Step 3: Evaluate the topic Model
+
+
+
 Standard topic modeling approaches assume the order of documents does not matter, making them unsuitable for time-stamped corpora. In contrast, *dynamic topic modeling* approaches track how language changes and topics evolve over time. We have developed a two-level approach for dynamic topic modeling via Non-negative Matrix Factorization (NMF), which links together topics identified in snapshots of text sources appearing over time.
 
 Details of this approach are described in the following paper ([Link](http://arxiv.org/abs/1607.03055)):
@@ -14,10 +52,6 @@ This repository contains a Python reference implementation of the above approach
 ### Dependencies
 Tested with Python 2.7 and Python 3.5, and requiring the following packages, which are available via PIP:
 
-* Required: [numpy >= 1.8.0](http://www.numpy.org/)
-* Required: [scikit-learn >= 0.14](http://scikit-learn.org/stable/)
-* Required for utility tools: [prettytable >= 0.7.2](https://code.google.com/p/prettytable/)
-* Required for automatic model selection: [gensim >= 0.10.3](https://radimrehurek.com/gensim/)
 
 ### Basic Usage
 
@@ -38,7 +72,7 @@ Once the data has been pre-processed, the next step is to generate the *window t
 	python find-window-topics.py data/month1.pkl data/month2.pkl data/month3.pkl -k 5 -o out
 	python find-window-topics.py data/.pkl -k 15 -o out
 
-
+python find-window-topics.py data/atheism.pkl  -k 15 -o out
 When the process has completed, we can view the descriptiors (i.e. the top ranked terms) for the resulting window topics as follows:
 
 	python display-topics.py out/month1_windowtopics_k05.pkl out/month2_windowtopics_k05.pkl out/month3_windowtopics_k05.pkl
@@ -47,6 +81,8 @@ When the process has completed, we can view the descriptiors (i.e. the top ranke
 The top terms and document IDs can be exported from a NMF results file to two individual comma-separated files using 'export-csv.py'. For instance, to export the top 50 terms and document IDs for a single results file:
 
 	python export-csv.py out/month1_windowtopics_k05.pkl -t 50
+python export-csv.py out/atheism_windowtopics_k15.pkl -t 50
+python find-dynamic-topics.py out/atheism_windowtopics_k15.pkl -k 5 -o out
 
 ##### Step 3: Dynamic Topic Modeling 
 Once the window topics have been created, we combine the results for the time windows to generate *dynamic topics* that span across multiple time windows. If we want to specify a fixed number of dynamic topics (e.g. *k=5*), we can run the following, where results are written to the directory 'out':

@@ -11,6 +11,7 @@ from sys import stdout
 all_words_path = '../data/output_list/listOfWordsIncluded.txt'
 
 
+
 def SIM1(x, y):
     if (len(x) != len(y)):
         print('error input,x and y is not in the same space')
