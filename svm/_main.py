@@ -10,7 +10,7 @@ from svmutil import *
 
 
 y, x = svm_read_problem("data/news20")
-m = svm_train(y, x, '-t 2 -v 10 -b 1')
+m = svm_train(y, x, '-t 2 -s 1')
 
 u, v = svm_read_problem("data/news20test")
 p_lable, p_acc, p_val = svm_predict(u, v, m)
