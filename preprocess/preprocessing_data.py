@@ -13,8 +13,6 @@ localpath_EditionDate = '/home/baiqingchun/00_data/20_output_data'
 # 分词后的localpath_EditionDate
 wordseg_localpath_EditionDate = '/home/baiqingchun/00_data/20_output_data_finish'
 
-deleteList = ['SECTION:', 'LENGTH:', 'Final Edition:', 'To the Editor:', 'BYLINE:', 'Late Edition', 'SOURCE:']
-
 
 # dirpath
 def WriteToLocal(dirpath):
