@@ -8,10 +8,39 @@ import logging as log
 from optparse import OptionParser
 
 import text.util
-
+from scipy.sparse import csr_matrix
 
 # --------------------------------------------------------------
 
+def read_problem(data_file_name):
+    """
+    svm_read_problem(data_file_name) -> [y, x]
+
+    Read LIBSVM-format data from data_file_name and return labels y
+    and data instances x.
+    """
+    prob_y = []
+    prob_x = []
+    prob_z = []
+    line_num = 0
+    #file_write = open("news20_all_data", 'w')
+    for line in open(data_file_name):
+        print line_num
+        line = line.split(None, 1)
+        # In case an instance with all zero features
+        # if len(line) == 1: line += ['']
+        label, features = line
+        for e in features.split():
+            ind, val = e.split(":")
+            # xi[int(ind)] = float(val)
+            #strs = "  (" + str(line_num) + ", " + str(ind) + ") " + str(float(val))
+            prob_x += [int(line_num)]
+            prob_y += [int(ind)]
+            prob_z += [float(val)]
+            #file_write.write(strs + "\n")
+        line_num += 1
+    a = csr_matrix((prob_z, (prob_x, prob_y))).toarray()
+    return prob_x,prob_y,a
 
 def main():
     parser = OptionParser(usage="usage: %prog [options] directory1 directory2 ...")
@@ -40,13 +69,6 @@ def main():
     else:
         dir_out = options.dir_out
 
-    # Load required stopwords
-    if options.stoplist_file is None:
-        stopwords = text.util.load_stopwords()
-    else:
-        log.info("Using custom stopwords from %s" % options.stoplist_file)
-        stopwords = text.util.load_stopwords(options.stoplist_file)
-
     # Process each directory
     for in_path in args:
         print "--in_path--"
@@ -56,15 +78,11 @@ def main():
         # Read content of all documents in the directory
         # 按行读取数据，转X
 
-        doc_ids, docs = text.util._read_data(in_path)
+        doc_ids,terms,X = read_problem(in_path)
 
-        log.info("Found %d documents to parse" % len(docs))
-
+        #terms=[1]
         # Pre-process the documents
-        log.info("Pre-processing documents (%d stopwords, tfidf=%s, normalize=%s, min_df=%d, max_ngram=%d) ..." % (
-            len(stopwords), options.apply_tfidf, options.apply_norm, options.min_df, options.max_ngram))
-        (X, terms) = text.util.preprocess(docs, stopwords, min_df=options.min_df, apply_tfidf=options.apply_tfidf,
-                                          apply_norm=options.apply_norm, ngram_range=(1, options.max_ngram))
+        #(X, terms) = x_preprocess(x)
         log.info("Created %dx%d document-term matrix" % X.shape)
 
         # Save the pre-processed documents

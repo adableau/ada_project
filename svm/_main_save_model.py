@@ -6,12 +6,14 @@ from svmutil import *
 # [label]   [Index1]:[value1]  [index2]:[value2]  [index3]:[value3]
 # [label]:类别（通常是整数）[index n]: 有顺序的索引 [value n]
 # http://www.cnblogs.com/Finley/p/5329417.html
+# 18:52
+# #
 
 y, x = svm_read_problem("data/news20")
 model_name = '20news_model'
 model = svm_load_model(model_name)
 if model is None:
-    model = svm_train(y, x, '-t 2 -s 1')
+    m = svm_train(y, x, '-t 1 -s 1 -b 1')
     svm_save_model(model_name, model)
 
 u, v = svm_read_problem("data/news20test")
