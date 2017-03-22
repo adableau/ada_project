@@ -16,7 +16,7 @@ Before applying dynamic topic modeling, the first step is to pre-process the doc
     -o data   output data address
 
     python prep-text.py /home/baiqingchun/00_data/20_output_data/test/alt.atheism -o data --tfidf --norm
-
+python document-term-matrix.py /home/baiqingchun/00_data/data_done/news20test -o data --tfidf --norm
 for the cvs data
 
     python prep--cvs-text.py -o data --tfidf --norm
@@ -26,7 +26,7 @@ The result of this process will be a collection of Joblib binary files (*.pkl an
 ##### Step 2: Topic Modeling
 
     python find-window-topics.py data/month1.pkl data/month2.pkl data/month3.pkl -k 5 -o out
-
+ python find-window-topics.py data/news20test.pkl -k 128 -o out
 When the process has completed, we can view the descriptiors (i.e. the top ranked terms) for the resulting window topics as follows:
 
 	python display-topics.py out/month1_windowtopics_k05.pkl out/month2_windowtopics_k05.pkl out/month3_windowtopics_k05.pkl

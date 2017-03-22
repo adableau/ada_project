@@ -98,7 +98,7 @@ def main():
             impl.W.shape[0], impl.W.shape[1], impl.H.shape[0], impl.H.shape[1]))
             save_tfidf_data("X_tfidf_W_%s_%s.csv" % window_name % k, impl.W)
             save_tfidf_data("X_tfidf_H_%s_%s.csv" % window_name % k, impl.H)
-            # Create a disjoint partition of documents,H
+            # Create a disjoint partition of documents,W
             partition = impl.generate_partition()
             print "--------partition--------"
             # print partition
@@ -109,9 +109,9 @@ def main():
             # Create term rankings for each topic,computed H
             term_rankings = []
             for topic_index in range(k):
-                ranked_term_indices = impl.rank_terms(topic_index)
+                ranked_term_indices = impl.rank_terms(topic_index) #第K行的H切片
                 print "ranked_term_indices---"
-                term_ranking = [terms[i] for i in ranked_term_indices]
+                term_ranking = [terms[i] for i in ranked_term_indices]#第K行的terms词
                 print "term_ranking---"
                 term_rankings.append(term_ranking)
             # Print out the top terms?

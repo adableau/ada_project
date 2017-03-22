@@ -17,14 +17,14 @@ import numpy as np
 
 def get_RMSE(X, U):
     rank = U[0].shape[1]
-    pred = np.ones(rank)
+    pred = np.ones(rank) #賦值為1，U的列
     err = 0.0
     nnz = 0
     for (key, val) in X.items():
         if np.isnan(val):
             continue
-        pred[:] = 1  # initialization
-        for l in xrange(self.mapper.order):
+        pred[:] = 1  # initialization 1
+        for l in xrange(2):
             pred *= U[l][key[l], :]
         err += (np.double(val) - np.sum(pred)) ** 2
         nnz += 1
@@ -61,3 +61,4 @@ def compute_rmse(arr):
     # compute rmse and return
     rmse = math.sqrt(sse) / len(arr)
     return rmse
+
