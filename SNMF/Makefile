@@ -11,8 +11,3 @@ $(data):
 
 $(voc):
 	wget https://archive.ics.uci.edu/ml/machine-learning-databases/bag-of-words/$@
-
-
-
-
-	python parse.py vocab.nips.txt 10

@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 import numpy as np
 import codecs
 import mapXm
@@ -188,3 +186,35 @@ class FM_base(object):
             return  np.linalg.norm(X_arr - UV) / np.linalg.norm(X_arr)
         except ZeroDivisionError:
             return 0
+
+
+#    def get_error_RMSE(self, itr, X=None, U=None):
+#        """
+#        Calculate ||X - U o V o W||_NNZ.
+#        X must be dictionary or dok_matrix.
+#        """
+#        if X is None:
+#            X = self.X
+#        if U is None:
+#            U = self.U
+#
+#        denom = 1#min(itr, self.mapper.N)
+#        pred = np.ones(self.rank)
+#        err = 0.0
+#        nnz = 0
+#        #for (key, val) in X.iteritems():
+#        for (key, val) in X.items():  # iteritems is not supported for pysparse (used in pyemf)
+#            if np.isnan(val):
+#                continue
+#            pred[:] = 1   # initialization
+#            for l in xrange(self.mapper.order):
+#                pred *= U[l][key[l], :]
+#            err += (np.double(val) / denom - np.sum(pred)) ** 2
+#            #err += (val / itr) ** 2
+#            #err += (np.sum(pred)) ** 2
+#            nnz += 1
+#        try:
+#            return np.sqrt(err / nnz)
+#        except ZeroDivisionError:
+#            return 0
+            

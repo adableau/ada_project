@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 import numpy as np
 import pyecp
 from collections import defaultdict
@@ -15,15 +13,10 @@ def get_error_RMSE(X, U):
         if np.isnan(val):
             continue
         pred[:] = 1   # initialization
-        for l in xrange(2):
+        for l in xrange(self.mapper.order):
             pred *= U[l][key[l], :]
         err += (np.double(val) - np.sum(pred)) ** 2
-        print "--------error-----"
-        print err
         nnz += 1
-
-    print "--------nnz-----"
-    print nnz
     try:
         return np.sqrt(err / nnz)
     except ZeroDivisionError:
@@ -240,10 +233,10 @@ class NMF(pyecp.FM_base):
         """
 
         start_time = datetime.datetime.now()
-        io_time = datetime.timedelta(0)  # datetime.timedelta对象是把时间转化为可以用于datetime.datetime对象加减的时间,而不是已经是时间差了
+        io_time = datetime.timedelta(0)
 
-        self.l1 = lambdas['l1']#0
-        self.l2 = lambdas['l2']#0
+        self.l1 = lambdas['l1']
+        self.l2 = lambdas['l2']
 
         ### record prediction for missing values if specified
         if pred_file is not None:
@@ -304,7 +297,6 @@ class NMF(pyecp.FM_base):
             # additional update for batch learning
             if is_batch:
                 err = 1e-30
-                print Xm
                 while np.abs(err - get_error_RMSE(Xm, self.U)) / err > epsilon:
                     err = get_error_RMSE(Xm, self.U)
                     if err == 0:
@@ -323,23 +315,6 @@ class NMF(pyecp.FM_base):
             if (self.itr + 1) % trace_opt['delta_topic'] == 0:
                 io_time += self.write_files(eta)
 
-            # apply blacklist
-            if (self.itr + 1) % trace_opt['delta_bl'] == 0 \
-                   and (self.itr + 1) >= trace_opt['start_bl']:
-                #for l in xrange(self.mapper.order):
-                #    self.filter_blacklist(l, gap=filter_gaps[l])
-                #if self.data_type == 'twitter':   # detect stop phrase
-                #    self.filter_blacklist(1, gap=filter_gaps[2], check_nitem=20, is_stopcomb=True)
-                for l in xrange(self.mapper.order):
-                    if l == 0:
-                        xmin_max = 1   # for outsider filtering, eliminate at most one user
-                    else:
-                        xmin_max = None
-
-                    if filter_gaps[l] > 0:
-                        self.filter_blacklist_LR(l, check_nitem=140, xmin_max=xmin_max)
-                if filter_gaps[2] > 0:
-                    self.filter_blacklist_LR(1, check_nitem=140, is_stopcomb=True, segmentation_strategy=filter_strategy)
                     
             # print #iterations and error
             if self.itr & (self.itr + 1) == 0:
@@ -348,8 +323,8 @@ class NMF(pyecp.FM_base):
                 #for l in xrange(self.mapper.order):
                 #    #print np.sum(self.U[l][:self.mapper.X_dim[l], :]) 
                 #    print np.sum(self.normalized_U(l)[:self.mapper.X_dim[l], :])
-                #if trace_opt['flag'] > 0:
-                print "%s: %.3f" % ("RMSE", get_error_RMSE(self.X, self.U))
+                if trace_opt['flag'] > 0:
+                    print "%s: %.3f" % ("RMSE", get_error_RMSE(self.X, self.U))
 
             # make prediction
             if pred_file is not None and (N_loop == 1 or count_loop == N_loop):

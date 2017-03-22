@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
 from __future__ import division
 import numpy as np
 from scipy.optimize import minimize_scalar
@@ -23,7 +20,7 @@ def distribution(x, alpha, xmin=1):
     return (x ** -alpha) / zeta(alpha, xmin, x.size)
 
 def CDF(x_rank, alpha, xmin=1):
-    """cumulative distribution function
+    """
     x_rank takes integer
     """
     return np.array([np.sum(distribution(x_rank, alpha, xmin)[:i]) for i in xrange(x_rank.size)])

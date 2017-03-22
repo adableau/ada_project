@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
 """ Parser for UCI bag-of-words dataset
 
 Usage: zcat docword.$(data).txt.gz | tail -n +4 | python parse.py vocab.$(data).txt $(min_freq)

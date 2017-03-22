@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 import sys
 import numpy as np
 import argparse
@@ -77,7 +76,7 @@ if args.verbose > 0:
     print filter_gaps
 
 opt = dict(file_name=args.input_file, is_skip_header=False)
-trace_opt = dict(flag=0, delta_topic=args.delta_topic, delta_bl=args.delta_bl, start_bl=args.start_bl)
+trace_opt = dict(flag=1, delta_topic=args.delta_topic, delta_bl=args.delta_bl, start_bl=args.start_bl)
 
 if args.init_model is not None: ### load cache file
     nmf = pickle.load(file(args.init_model, 'rb'))
