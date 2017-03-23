@@ -11,24 +11,36 @@ Usage: zcat docword.$(data).txt.gz | tail -n +4 | python parse.py vocab.$(data).
 import sys
 from collections import defaultdict
 
-min_freq = int(sys.argv[2])
-mp = dict()
-for i, line in enumerate(open(sys.argv[1], 'r')):
-    mp[i + 1] = line.strip()
 
+file_voc = 'vocab.nips.txt'
+file_doc = 'docword.nips.txt'
+file_doc_word = 'docword.txt'
 
-old_i = 1
-word_queue = dict()
-for line in sys.stdin:
-    i, j, k = [int(num) for num in line.split()]
+def _main_func():
+    min_freq = 3
+    mp = dict()#存放词频
+    for i, line in enumerate(open(file_voc, 'r')):
+        mp[i + 1] = line.strip()
 
-    if i != old_i:
-        for w1, f1 in word_queue.iteritems():
-            for w2, f2 in word_queue.iteritems():
-                print w1, w2, f1 * f2
-        print
-        word_queue = dict()
+    write_file = open(file_doc_word,'w')
+    old_i = 1
+    word_queue = dict()#文章中词/词频对
+    for line in open(file_doc, 'r'):
+        i, j, k = [int(num) for num in line.split()]#doc,word, frequency
+        # 迭代输出,作为下一次的输入
+        if i != old_i:
+            for w1, f1 in word_queue.iteritems():
+                for w2, f2 in word_queue.iteritems():
+                    str_w = str(w1)+','+ str(w2)+','+ str(f1 * f2)
+                    write_file.write(str_w)
+                    write_file.write("\n")
+            write_file.write("\n")
+            word_queue = dict()
 
-    if k >= min_freq:
-        word_queue[mp[j]] = k
-    old_i = i
+        if k >= min_freq:
+            word_queue[mp[j]] = k
+        old_i = i
+    write_file.close()
+    print '--finished---'
+
+_main_func()

@@ -15,14 +15,14 @@ class Map_Xm(object):
         self.idf = defaultdict(dict)
 
         self.mapper = list()
-        self.blacklist = list()
+        #self.blacklist = list()
         self.stopcomb = list()
         self.reverse = list()
         for l in xrange(self.order):
             mp = defaultdict(None)
             mp.default_factory = mp.__len__
             self.mapper.append(mp)
-            self.blacklist.append(set())
+            #self.blacklist.append(set())
             self.reverse.append(dict())
             self.stopcomb.append(list())
 
@@ -98,25 +98,27 @@ class Map_Xm(object):
             if len(comb & termset) == len(comb):
                 return True
         return False
-        
+
     def get_Xm(self, m=None):
         """
         Convert words to unique IDs and update mappers.
         """
 
         Xm = defaultdict(int)
-        while True:
-            line = sys.stdin.readline()
+        file_doc_word = 'docword.txt'
+        for line in open(file_doc_word, 'r'):
+            while True:
+                #line = sys.stdin.readline()
 
-            if line.strip() == '':
-                break
-            
-            triplet = line.strip().split()
-            assert len(triplet) == 3, 'file format is broken : ' + line
-                
-            ind = (self.mapper[0][triplet[0]], self.mapper[1][triplet[1]])
-            Xm[ind] += float(triplet[2])
-            (self.idf[ind[1]])[ind[0]] = 1
+                if line.strip() == '':
+                    break
+
+                triplet = line.strip().split()
+                assert len(triplet) == 3, 'file format is broken : ' + line
+
+                ind = (self.mapper[0][triplet[0]], self.mapper[1][triplet[1]])
+                Xm[ind] += float(triplet[2])
+                (self.idf[ind[1]])[ind[0]] = 1
 
         self.update_Xdim()
 

@@ -215,6 +215,8 @@ class NMF(pyecp.FM_base):
             self.mapper.update_reverse()
             self.write_blacklist(file_prefix=self.result_pref)
 
+
+########################################################################################################
     def train(self, rank, N_loop=1,
               X_opt=None,
               trace_opt=dict(flag=0, delta_topic=300, delta_bl=1200),

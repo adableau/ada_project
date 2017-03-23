@@ -51,6 +51,12 @@ parser.add_argument('--sg_filtering', dest='sg_bl',
 parser.add_argument('--verbose', type=int, dest='verbose', default=0)
 #python run_nmf.py --rank 10 --delta_topic 50 --learning_rate 'invsqrt'
 args = parser.parse_args()
+
+file_doc_word = 'docword.txt'
+args.rank = 10
+args.delta_topic = 50
+args.learning_rate = 'invsqrt'
+
 X_normalized = False
 
 lambdas = dict(l1=args.l1, l2=args.l2)
