@@ -55,7 +55,7 @@ args = parser.parse_args()
 file_doc_word = 'docword.txt'
 args.rank = 10
 args.delta_topic = 50
-args.learning_rate = 'const'
+args.learning_rate = 'invsqrt'
 args.batch = True
 
 X_normalized = False

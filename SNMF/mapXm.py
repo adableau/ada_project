@@ -98,8 +98,7 @@ class Map_Xm(object):
             if index >= self.data_index:
 
                 if line.strip() == '--':
-                    self.data_index = index+1
-                    #print str(index) + '------------------'
+                    self.data_index = index + 1
                     break
 
                 triplet = line.strip().split(',')

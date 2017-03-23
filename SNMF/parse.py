@@ -15,7 +15,7 @@ file_doc = 'docword.nip.txt'
 file_doc_word = 'docword.txt'
 
 def _main_func():
-    min_freq = 2
+    min_freq = 3
     mp = dict()#存放词频
     for i, line in enumerate(open(file_voc, 'r')):
         mp[i + 1] = line.strip()
@@ -33,7 +33,6 @@ def _main_func():
                     write_file.write(str_w)
                     write_file.write("\n")
             write_file.write("--\n")
-        print str(i)+'-----'
         word_queue = dict()
 
         if k >= min_freq:
