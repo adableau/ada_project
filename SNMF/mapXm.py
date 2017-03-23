@@ -4,22 +4,24 @@ from collections import defaultdict, deque
 import datetime
 import sys
 
+
 class Map_Xm(object):
     def __init__(self, tfidf_opt=None, file_name=None):
         self.order = 2  # matrix data only
+        self.data_index = 0  # matrix data only
         self.X_dim = np.zeros(self.order, dtype=int)
         self.tfidf_opt = tfidf_opt
         self.idf = defaultdict(dict)
 
         self.mapper = list()
-        self.blacklist = list()
+        # self.blacklist = list()
         self.stopcomb = list()
         self.reverse = list()
         for l in xrange(self.order):
             mp = defaultdict(None)
             mp.default_factory = mp.__len__
             self.mapper.append(mp)
-            self.blacklist.append(set())
+            # self.blacklist.append(set())
             self.reverse.append(dict())
             self.stopcomb.append(list())
 
@@ -41,16 +43,15 @@ class Map_Xm(object):
                 v = np.log(v) + 1
             elif self.tfidf_opt['tf'] == 'sqrt':
                 v = np.sqrt(v)
-                
+
             if self.tfidf_opt['idf']:
                 v *= np.log(float(self.X_dim[doc_mode]) / len(self.idf[k[word_mode]]))
             Xm[k] = v
 
-        
         if self.tfidf_opt['normalization']:
             norm = np.zeros(self.X_dim[doc_mode])
             for (k, v) in Xm.iteritems():
-                norm[k[doc_mode]] += v**2
+                norm[k[doc_mode]] += v ** 2
             for (k, v) in Xm.iteritems():
                 Xm[k] /= np.sqrt(norm[k[doc_mode]])
 
@@ -69,22 +70,10 @@ class Map_Xm(object):
                 mp[k] = v
             self.mapper[l] = mp
 
-
     def update_Xdim(self):
         for l in xrange(self.order):
             self.X_dim[l] = len(self.mapper[l])
-            
-    def add_blacklist(self, i, mode):
-        self.blacklist[mode].update(i)
-            
-    def in_blacklist(self, ind):
-        for l in xrange(self.order):
-            if ind[l] is None:
-                continue
-            if ind[l] in self.blacklist[l]:
-                return True
-        return False
-    
+
     def add_stopcomb(self, comb, mode):
         set_comb = set(comb)
         if not self.in_stopcomb(set_comb, mode):
@@ -95,33 +84,36 @@ class Map_Xm(object):
             if len(comb & termset) == len(comb):
                 return True
         return False
-        
+
     def get_Xm(self, m=None):
         """
         Convert words to unique IDs and update mappers.
         """
 
         Xm = defaultdict(int)
-        while True:
-            line = sys.stdin.readline()
+        file_doc_word = 'docword.txt'
+        files = open(file_doc_word, 'r').readlines()
+        for index, line in enumerate(files):
+            # line = sys.stdin.readline()
+            if index >= self.data_index:
 
-            if line.strip() == '':
-                break
-            
-            triplet = line.strip().split()
-            assert len(triplet) == 3, 'file format is broken : ' + line
-                
-            ind = (self.mapper[0][triplet[0]], self.mapper[1][triplet[1]])
-            Xm[ind] += float(triplet[2])
-            (self.idf[ind[1]])[ind[0]] = 1
+                if line.strip() == '--':
+                    self.data_index = index+1
+                    #print str(index) + '------------------'
+                    break
 
+                triplet = line.strip().split(',')
+                assert len(triplet) == 3, 'file format is broken : ' + line
+
+                ind = (self.mapper[0][triplet[0]], self.mapper[1][triplet[1]])
+                Xm[ind] += float(triplet[2])
+                (self.idf[ind[1]])[ind[0]] = 1
         self.update_Xdim()
 
         if not line:  # EOF
             nnz = -1
         else:
             nnz = len(Xm)
-
         if self.tfidf_opt is not None:
             self.apply_tfidf(Xm)
 
@@ -139,14 +131,10 @@ class Map_Xm(object):
         for l in xrange(self.order):
             self.reverse[l] = dict((v, k) for k, v in self.mapper[l].iteritems())
         return self.reverse
-    
+
     def write_mapper(self, file_name="", mode=0, sep=" "):
         fp = codecs.open(file_name, "w", encoding="utf-8")
         for i in xrange(len(self.reverse[mode])):
             line = ("%d" + sep + "%s\n") % (i, self.reverse[mode][i])
             fp.write(line.decode('utf-8'))
         fp.close()
-        
-
-
-

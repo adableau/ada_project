@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 import sys
 import numpy as np
 import argparse
@@ -9,7 +10,7 @@ from streamingNMF import NMF
 parser = argparse.ArgumentParser()
 parser.add_argument('--batch', dest='batch', action='store_true', default=False,
                    help='Learn with the batch alternating least square algorithm')
-parser.add_argument('-r', '--rank', type=int, dest='rank', required=True, 
+parser.add_argument('-r', '--rank', type=int, dest='rank', required=False,
                    help='The rank of the decomposed matrix')
 parser.add_argument('-i', '--input', dest='input_file', default='stdin',
                    help='The edge list of the matrix to decompose')
@@ -50,6 +51,13 @@ parser.add_argument('--sg_filtering', dest='sg_bl',
 parser.add_argument('--verbose', type=int, dest='verbose', default=0)
 
 args = parser.parse_args()
+
+file_doc_word = 'docword.txt'
+args.rank = 10
+args.delta_topic = 50
+args.learning_rate = 'const'
+args.batch = True
+
 X_normalized = False
 
 lambdas = dict(l1=args.l1, l2=args.l2)
@@ -64,7 +72,7 @@ elif args.eta == 'inv':
 elif args.eta == 'invsqrt':
     eta_opt = dict(type='adversarial', coef=args.scale)
     
-filter_gaps = [int(c) for c in args.filter]
+
 if np.isnan(args.delta_bl):
     args.delta_bl = args.delta_topic
 
@@ -73,7 +81,7 @@ if args.verbose > 0:
     print lambdas
     print X_opt
     print eta_opt
-    print filter_gaps
+
 
 opt = dict(file_name=args.input_file, is_skip_header=False)
 trace_opt = dict(flag=1, delta_topic=args.delta_topic, delta_bl=args.delta_bl, start_bl=args.start_bl)
@@ -86,10 +94,11 @@ else:
     nmf = NMF(result_pref=args.pref)
     is_init = True
 
+print 'start---------'
+nmf.train(rank=args.rank, N_loop=args.max_itr, trace_opt=trace_opt, lambdas=lambdas, X_opt=X_opt,  eta_opt=eta_opt, pred_file=args.pred_file, is_init=is_init, is_batch=args.batch)
+print 'finished---------'
 
-nmf.train(rank=args.rank, N_loop=args.max_itr, trace_opt=trace_opt, lambdas=lambdas, X_opt=X_opt, filter_gaps=filter_gaps, eta_opt=eta_opt, pred_file=args.pred_file, is_init=is_init, is_batch=args.batch, filter_strategy=args.sg_bl)
 
-
-if args.save_model is not None: ### save cache file
+if args.save_model is not None:  ### save cache file
     nmf.mapper.encode()
     pickle.dump(nmf, file(args.save_model, 'wb'), protocol=pickle.HIGHEST_PROTOCOL)

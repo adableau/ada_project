@@ -12,18 +12,18 @@ def to_seconds_float(timedelta):
 
     :raise ValueError: If :param:`timedelta.days` is truthy.
 
-        >>> to_seconds_float(datetime.timedelta(seconds=1, milliseconds=500))
         1.5
     """
     return timedelta.seconds + timedelta.microseconds / 1E6 \
-        + timedelta.days * 86400
+           + timedelta.days * 86400
 
 
 class FM_base(object):
     """
     Base class of factorization methods.
     """
-    def __init__(self, result_pref=''):
+
+    def __init__(self, result_pref='out'):
 
         self.mapper = mapXm.Map_Xm()
         self.err = list()
@@ -47,7 +47,7 @@ class FM_base(object):
         for l in xrange(self.mapper.order):
             prodnorm_U = prodnorm_U * self.norm_U(l)
         return prodnorm_U
-    
+
     def reorder_U(self):
         """
         Sort columns (topic) of U.
@@ -80,32 +80,14 @@ class FM_base(object):
         topic_order = self.reorder_U()
         self.rescale_U()
         return topic_order
-    
-    def write_blacklist(self, file_prefix=None):
-        file_name = file_prefix + "blacklist.txt"
-        fp = codecs.open(file_name, "w", encoding="utf-8")
-        
-        fp.write('BLACK LIST:\n')
-        for l in xrange(self.mapper.order):
-            for i in self.mapper.blacklist[l]:
-                fp.write(self.mapper.reverse[l][i].decode('utf-8') + ' ')
-            fp.write('\n')
-            
-        fp.write('\nSTOP COMBINATION:\n')
-        for l in xrange(self.mapper.order):
-            for comb in self.mapper.stopcomb[l]:
-                for i in comb:
-                    fp.write(self.mapper.reverse[l][i].decode('utf-8') + ' ')
-                fp.write('\n')    
-        fp.close()
-            
+
     def write_topics(self, eta, N_word=10, file_prefix=None, is_tfidf=False):
         file_name = file_prefix + "topics.txt"
 
         ### convert scalar eta to np.array
         if np.isscalar(eta):
             eta = eta * np.ones(self.rank)
-        
+
         modes_iterator = xrange(self.mapper.order)
 
         topic_score = self.get_prodnorm_U()
@@ -119,14 +101,15 @@ class FM_base(object):
 
         fp = codecs.open(file_name, "w", encoding="utf-8")
         for enum, r in enumerate(topic_order):
-            #if topic_order[r] >= self.rank / 2:
+            # if topic_order[r] >= self.rank / 2:
             #    fp.write("*")
-                
+
             fp.write("TOPIC %d Norm:%.4f eta:%.4f\n" % (r + 1, topic_score[r], eta[r]))
             for w in xrange(N_word):
                 for l in modes_iterator:
                     i = top_N_words[l][r, w]
-                    fmt = "%.2f %1.1f %s\t" % (self.U[l][i, r], np.log10(self.doc_freq[l][i]), self.mapper.reverse[l][i])
+                    fmt = "%.2f %1.1f %s\t" % (
+                    self.U[l][i, r], np.log10(self.doc_freq[l][i]), self.mapper.reverse[l][i])
                     fp.write(fmt.decode('utf-8'))
                 fp.write('\n')
             fp.write('\n')
@@ -136,7 +119,7 @@ class FM_base(object):
         """
         Save extracted features in (gzipped) CSV format.
         """
-        #self.reorganize_U()
+        # self.reorganize_U()
 
         for l in xrange(self.mapper.order):
             file_name = file_prefix + "U" + str(l) + ".csv.gz"
@@ -152,8 +135,8 @@ class FM_base(object):
             for mode in xrange(self.mapper.order):
                 U_mode = self.U[mode][:self.mapper.X_dim[l], :]
                 U_new = -np.sort(-U_mode, axis=0)[:topM, :] * volume[int(not mode)]
-                
-                #for k in xrange(self.rank):
+
+                # for k in xrange(self.rank):
                 #    U_new[:, k] = -np.sort(-self.U[mode][:, k])[:topM] * const[k]
 
                 np.savetxt('%sU%d_top%d.csv.gz' % (file_prefix, mode, topM), U_new)
@@ -169,52 +152,20 @@ class FM_base(object):
         Only for matrix case
         """
         assert self.mapper.order == 2, \
-               'Currently only support for matrix cases'
-        
+            'Currently only support for matrix cases'
+
         if X is None:
             X = self.X
         if U is None:
             U = self.U
-        
+
         UV = np.dot(self.U[0][:self.mapper.X_dim[0], ], \
                     self.U[1][:self.mapper.X_dim[1], ].T)
         X_arr = np.zeros(self.mapper.X_dim)
         for (key, val) in X.iteritems():
             X_arr[key] = val
-            
-        try:  
-            return  np.linalg.norm(X_arr - UV) / np.linalg.norm(X_arr)
+
+        try:
+            return np.linalg.norm(X_arr - UV) / np.linalg.norm(X_arr)
         except ZeroDivisionError:
             return 0
-
-
-#    def get_error_RMSE(self, itr, X=None, U=None):
-#        """
-#        Calculate ||X - U o V o W||_NNZ.
-#        X must be dictionary or dok_matrix.
-#        """
-#        if X is None:
-#            X = self.X
-#        if U is None:
-#            U = self.U
-#
-#        denom = 1#min(itr, self.mapper.N)
-#        pred = np.ones(self.rank)
-#        err = 0.0
-#        nnz = 0
-#        #for (key, val) in X.iteritems():
-#        for (key, val) in X.items():  # iteritems is not supported for pysparse (used in pyemf)
-#            if np.isnan(val):
-#                continue
-#            pred[:] = 1   # initialization
-#            for l in xrange(self.mapper.order):
-#                pred *= U[l][key[l], :]
-#            err += (np.double(val) / denom - np.sum(pred)) ** 2
-#            #err += (val / itr) ** 2
-#            #err += (np.sum(pred)) ** 2
-#            nnz += 1
-#        try:
-#            return np.sqrt(err / nnz)
-#        except ZeroDivisionError:
-#            return 0
-            
