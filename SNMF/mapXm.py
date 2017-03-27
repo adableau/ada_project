@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import numpy as np
 import codecs
 from collections import defaultdict, deque
@@ -88,10 +89,11 @@ class Map_Xm(object):
     def get_Xm(self, m=None):
         """
         Convert words to unique IDs and update mappers.
+        返回xm 也就是X的数据流
         """
 
         Xm = defaultdict(int)
-        file_doc_word = 'docword.txt'
+        file_doc_word = 'docword.nip.txt'
         files = open(file_doc_word, 'r').readlines()
         for index, line in enumerate(files):
             # line = sys.stdin.readline()
@@ -101,13 +103,13 @@ class Map_Xm(object):
                     self.data_index = index + 1
                     break
 
-                triplet = line.strip().split(',')
+                triplet = line.strip().split()
                 assert len(triplet) == 3, 'file format is broken : ' + line
-
+                #转为（a,b） 1.222形式
                 ind = (self.mapper[0][triplet[0]], self.mapper[1][triplet[1]])
                 Xm[ind] += float(triplet[2])
                 (self.idf[ind[1]])[ind[0]] = 1
-        self.update_Xdim()
+        self.update_Xdim()#x的shape为三元组的长度m（triplet[0]）个doc，n（triplet[1]）个词
 
         if not line:  # EOF
             nnz = -1

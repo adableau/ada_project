@@ -189,7 +189,7 @@ class NMF(pyecp.FM_base):
               trace_opt=dict(flag=1, delta_topic=300, delta_bl=1200),
               lambdas=dict(l1=0, l2=0),
               init_guess=0.01,
-              init_Udim=10000,
+              init_Udim=10000,#
               init_U=None,
               rand_seed=1,
               eta_opt=dict(type='adversarial', coef=1),
